@@ -30,8 +30,8 @@ class RouletteWheel:
         cumsum = 0
         while idx < len(self.scaled_list):
             cumsum += self.scaled_list[idx]
-            idx += 1
             if cumsum > random_val:
                 return self.population[idx]
+            idx += 1
 
         return self.population[idx]

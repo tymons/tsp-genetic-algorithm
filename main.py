@@ -47,7 +47,7 @@ def main():
     population = []
 
     # population initialization
-    for idx in range(1, pop_size):
+    for idx in range(pop_size):
         population.append(np.random.permutation(max_cites))
 
     distances_matrix = get_distances_matrix(max_cites)
@@ -57,7 +57,7 @@ def main():
 
     rw = RouletteWheel(population, fitness_score)
     new_population = []
-    for i in range(len(population)):
+    for i in range(int(len(population)/2)):
         offsprings = NewChildProducer.one_point_crossover(rw.wheel(), rw.wheel(), 7)
         mutated_child_one = NewChildProducer.mutate_reverse(offsprings['child_one'], 3, 3)
         mutated_child_two = NewChildProducer.mutate_reverse(offsprings['child_two'], 3, 3)
