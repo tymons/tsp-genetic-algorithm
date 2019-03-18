@@ -59,8 +59,8 @@ def main():
     new_population = []
     for i in range(len(population)):
         offsprings = NewChildProducer.one_point_crossover(rw.wheel(), rw.wheel(), 7)
-        mutated_child_one = NewChildProducer.mutate(offsprings['child_one'])
-        mutated_child_two = NewChildProducer.mutate(offsprings['child_one'])
+        mutated_child_one = NewChildProducer.mutate_reverse(offsprings['child_one'], 3, 3)
+        mutated_child_two = NewChildProducer.mutate_reverse(offsprings['child_two'], 3, 3)
         new_population.append(mutated_child_one)
         new_population.append(mutated_child_two)
 
