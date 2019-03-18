@@ -1,59 +1,33 @@
 import numpy as np
-import operator
-import pandas as pd
-import random
-import matplotlib.pyplot as plt
-import seaborn as sns
 from roulette_wheel import RouletteWheel
-
-from fitness import Fitness
-
-
-def create_route(city_list):
-    return random.sample(city_list, len(city_list))
+from new_child_producer import NewChildProducer
 
 
-def initial_population(population_size, city_list):
-    population = []
+def calculate_fitness(chromosomes, distances_matrix):
+    """
+    Function that calculates fitness for every chromosome based on distance matrix
+    :param chromosomes:         array of vectors with chromosomes
+    :param distances_matrix:    matrix of distances between different cities
+    :return:                    vector with length of len(chromosomes) and calculates fitness functions
+    """
+    fitness_score = np.zeros(len(chromosomes))
+    for i in range(len(chromosomes)):
+        for j in range(len(chromosomes[i])):
+            if j + 1 < len(chromosomes[i]):
+                value = distances_matrix[chromosomes[i][j]][chromosomes[i][j + 1]]
+            else:
+                value = distances_matrix[chromosomes[i][j]][chromosomes[i][0]]
+            fitness_score[i] += value
 
-    for i in range(0, population_size):
-        population.append(create_route(city_list))
-    return population
-
-
-def rank_routes(population):
-    fitness_results = {}
-    for i in range(0, len(population)):
-        fitness_results = Fitness(population[i]).fitness_function()
-    return sorted(fitness_results.items(), key=operator.itemgetter(1), reverse=True)
-
-
-def selection(pop_ranked, elite_size):
-    selection_results = []
-    df = pd.DataFrame(np.array(pop_ranked), columns=["Index", "Fitness"])
-    df['cum_sum'] = df.Fitness.cumsum()
-    df['cum_perc'] = 100 * df.cum_sum / df.Fitness.sum()
-
-    for i in range(0, elite_size):
-        selection_results.append(pop_ranked[i][0])
-    for i in range(0, len(pop_ranked) - elite_size):
-        pick = 100 * random.random()
-        for i in range(0, len(pop_ranked)):
-            if pick <= df.iat[i, 3]:
-                selection_results.append(pop_ranked[i][0])
-                break
-    return selection_results
-
-
-def mating_pool(population, selection_results):
-    matingpool = []
-    for i in range(0, len(selection_results)):
-        index = selection_results[i]
-        matingpool.append(population[index])
-    return matingpool
+    return fitness_score
 
 
 def get_distances_matrix(size_of_matrix):
+    """
+    Function that prepares random distance matrix based on the max cities
+    :param size_of_matrix:      max number of cities
+    :return:                    size_of_matrix X size_of_matrix matrix with distances
+    """
     shape = (size_of_matrix, size_of_matrix)
     a = np.ones(shape)
 
@@ -79,17 +53,21 @@ def main():
     distances_matrix = get_distances_matrix(max_cites)
 
     # calculate distances with distances matrix
+    fitness_score = calculate_fitness(population, distances_matrix)
 
+    rw = RouletteWheel(population, fitness_score)
+    new_population = []
+    for i in range(len(population)):
+        offsprings = NewChildProducer.one_point_crossover(rw.wheel(), rw.wheel(), 7)
+        mutated_child_one = NewChildProducer.mutate(offsprings['child_one'])
+        mutated_child_two = NewChildProducer.mutate(offsprings['child_one'])
+        new_population.append(mutated_child_one)
+        new_population.append(mutated_child_two)
 
     # Show distribution o population
     # plt.figure()
     # plt.hist(population, color='blue', bins=200)
     # plt.show()
-
-    # rw = RouletteWheel(rand_vec)
-
-    # for i in range(0, 10):
-    #    elem.append(rw.wheel())
 
 
 if __name__ == "__main__":
