@@ -19,7 +19,6 @@ class RouletteWheel:
             self.scaled_list.append(value)
 
         self.scaled_list = np.divide(self.scaled_list, sum(self.scaled_list))
-        print(sum(self.scaled_list))
 
     def wheel(self):
         if len(self.scaled_list) == 0:
@@ -34,4 +33,4 @@ class RouletteWheel:
                 return self.population[idx]
             idx += 1
 
-        return self.population[idx]
+        return self.population[-1]
