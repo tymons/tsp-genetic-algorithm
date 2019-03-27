@@ -5,9 +5,9 @@ import numpy as np
 
 
 class RouletteWheel:
-    def __init__(self, population, fitness_values):
-        self.fitness_values = fitness_values
-        self.population = population
+    def __init__(self):
+        self.fitness_values = []
+        self.population = []
         self.scaled_list = []
 
     def feature_scaling(self, input_list):
@@ -34,3 +34,8 @@ class RouletteWheel:
             idx += 1
 
         return self.population[-1]
+
+    def tournament(self, population_with_fitness, packet_size):
+        fit_sub = np.random.choice([x[1] for x in population_with_fitness], packet_size, replace=False)
+        elem = population_with_fitness[np.argmin(fit_sub)]
+        return elem
