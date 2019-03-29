@@ -1,9 +1,7 @@
 import numpy as np
-import time
 import matplotlib.pyplot as plt
-from roulette_wheel import RouletteWheel
+from roulette_wheel import ChromosomePicker
 from new_child_producer import NewChildProducer
-
 
 
 def get_cities_from_map(no_cities):
@@ -22,7 +20,7 @@ def calculate_fitness(chromosomes, distances_matrix):
     :param distances_matrix:    matrix of distances between different cities
     :return:                    List of tuples where first element is chromosome and second fitness score
     """
-    population_with_fitness = list()
+    population_fitness = []
     for i in range(len(chromosomes)):
         acc = 0
         for j in range(len(chromosomes[i])):
@@ -31,9 +29,9 @@ def calculate_fitness(chromosomes, distances_matrix):
             else:
                 value = distances_matrix[chromosomes[i][j]][chromosomes[i][0]]
             acc += value
-        population_with_fitness.append((chromosomes[i], acc))
+        population_fitness.append(acc)
 
-    return population_with_fitness
+    return population_fitness
 
 
 def get_distances_matrix(coordinates_tuple_list):
@@ -72,10 +70,10 @@ def draw_path(winner, coordinates_table):
 
 def main():
     max_cites = 15
-    pop_size = 100
-    no_chromosomes_out = 20
+    pop_size = 150
+    no_chromosomes_out = 80
     population = []
-    max_epochs = 200
+    max_epochs = 400
     epoch_num = 0
 
     # Interactive map for choosing city location
@@ -90,31 +88,31 @@ def main():
         permutation_list = np.insert(permutation_list, 0, 0)
         population.append(permutation_list)
 
-    rw = RouletteWheel()
+    picker = ChromosomePicker()
     while epoch_num < max_epochs:
         # calculate distances with distances matrix
-        pop_fit_tuple_list = calculate_fitness(population, distances_matrix)
-        fitness_score = [x[1] for x in pop_fit_tuple_list]
+        fitness = calculate_fitness(population, distances_matrix)
+
         print("Minimum fitness score at epoch " + str(epoch_num) + " is : " +
-              str(min(fitness_score)) + " with pop size: " + str(len(pop_fit_tuple_list)))
+              str(min(fitness)) + " with pop size: " + str(len(population)))
 
         # Draw winner
-        winner = pop_fit_tuple_list[fitness_score.index(min(fitness_score))][0]
+        winner = population[fitness.index(min(fitness))]
         draw_path(winner, coordinates)
 
         # Get rid of the worst ones
         for j in range(no_chromosomes_out // 2):
-            del population[(fitness_score.index(max(fitness_score)))]
-            del fitness_score[fitness_score.index(max(fitness_score))]
-            del population[fitness_score.index(max(fitness_score))]
-            del fitness_score[fitness_score.index(max(fitness_score))]
+            del population[(fitness.index(max(fitness)))]
+            del fitness[fitness.index(max(fitness))]
+            del population[fitness.index(max(fitness))]
+            del fitness[fitness.index(max(fitness))]
 
         for i in range(no_chromosomes_out // 2):
-            offsprings = NewChildProducer.one_point_crossover(
-                rw.tournament(pop_fit_tuple_list, 40),
-                rw.tournament(pop_fit_tuple_list, 40))
-            mutated_child_one = NewChildProducer.mutate_reverse(offsprings['child_one'], 3, 2)
-            mutated_child_two = NewChildProducer.mutate_reverse(offsprings['child_two'], , 2)
+            offspring_one, offspring_two = NewChildProducer.one_point_crossover(
+                picker.tournament(population, fitness, 20),
+                picker.tournament(population, fitness, 20))
+            mutated_child_one = NewChildProducer.mutate_reverse(offspring_one, 4, 2)
+            mutated_child_two = NewChildProducer.mutate_reverse(offspring_two, 4, 2)
             # Add better child on their position
             population.append(mutated_child_one)
             population.append(mutated_child_two)

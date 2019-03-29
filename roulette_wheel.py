@@ -4,7 +4,7 @@ import random
 import numpy as np
 
 
-class RouletteWheel:
+class ChromosomePicker:
     def __init__(self):
         self.fitness_values = []
         self.population = []
@@ -35,7 +35,19 @@ class RouletteWheel:
 
         return self.population[-1]
 
-    def tournament(self, population_with_fitness, packet_size):
-        fit_sub = np.random.choice([x[1] for x in population_with_fitness], packet_size, replace=False)
-        elem = population_with_fitness[np.argmin(fit_sub)]
-        return elem
+    def tournament(self, population, fitness, packet_size):
+        population_idx = np.random.choice(list(range(len(population))), packet_size, replace=False)
+
+        if len(population) != len(fitness):
+            print("ERROR!")
+
+        minimum = fitness[population_idx[0]]
+        minimum_idx = population_idx[0]
+        for idx in population_idx:
+            if idx > len(fitness):
+                print("ERROR!")
+            if minimum < fitness[idx]:
+                minimum = fitness[idx]
+                minimum_idx = idx
+
+        return population[minimum_idx]
