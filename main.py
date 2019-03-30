@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from roulette_wheel import ChromosomePicker
+import chromosome_picker as cp
 from new_child_producer import NewChildProducer
 
 
@@ -13,21 +13,21 @@ def get_cities_from_map(no_cities):
     return x
 
 
-def calculate_fitness(chromosomes, distances_matrix):
+def calculate_fitness(chromosomes_list, distances_matrix):
     """
     Function that calculates fitness for every chromosome based on distance matrix
-    :param chromosomes:         array of vectors with chromosomes
+    :param chromosomes_list:         array of vectors with chromosomes
     :param distances_matrix:    matrix of distances between different cities
     :return:                    List of tuples where first element is chromosome and second fitness score
     """
     population_fitness = []
-    for i in range(len(chromosomes)):
+    for i in range(len(chromosomes_list)):
         acc = 0
-        for j in range(len(chromosomes[i])):
-            if j + 1 < len(chromosomes[i]):
-                value = distances_matrix[chromosomes[i][j]][chromosomes[i][j + 1]]
+        for j in range(len(chromosomes_list[i])):
+            if j + 1 < len(chromosomes_list[i]):
+                value = distances_matrix[chromosomes_list[i][j]][chromosomes_list[i][j + 1]]
             else:
-                value = distances_matrix[chromosomes[i][j]][chromosomes[i][0]]
+                value = distances_matrix[chromosomes_list[i][j]][chromosomes_list[i][0]]
             acc += value
         population_fitness.append(acc)
 
@@ -64,16 +64,19 @@ def draw_path(winner, coordinates_table):
 
     coordinates.append(coordinates_table[0])
     plt.plot([x[0] for x in coordinates], [x[1] for x in coordinates], '-o')
-    plt.pause(0.05)
+    plt.plot(coordinates[0][0], coordinates[0][1], alpha=0.8, c="g", marker=r'$\clubsuit$',
+             label="Start position", markersize=22)
+    plt.xlabel("X")
+    plt.ylabel("Y")
     plt.show()
 
 
 def main():
     max_cites = 15
-    pop_size = 150
+    pop_size = 100
     no_chromosomes_out = 80
     population = []
-    max_epochs = 400
+    max_epochs = 1500
     epoch_num = 0
 
     # Interactive map for choosing city location
@@ -88,38 +91,40 @@ def main():
         permutation_list = np.insert(permutation_list, 0, 0)
         population.append(permutation_list)
 
-    picker = ChromosomePicker()
+    fitness = calculate_fitness(population, distances_matrix)
+
     while epoch_num < max_epochs:
         # calculate distances with distances matrix
-        fitness = calculate_fitness(population, distances_matrix)
-
         print("Minimum fitness score at epoch " + str(epoch_num) + " is : " +
               str(min(fitness)) + " with pop size: " + str(len(population)))
 
-        # Draw winner
-        winner = population[fitness.index(min(fitness))]
-        draw_path(winner, coordinates)
+        for i in range(no_chromosomes_out // 2):
+            offspring_one, offspring_two = NewChildProducer.one_point_crossover(
+                cp.tournament(population, fitness, 20),
+                cp.tournament(population, fitness, 20))
+            mutated_child_one = NewChildProducer.mutate_reverse(offspring_one, 4, 2)
+            mutated_child_two = NewChildProducer.mutate_reverse(offspring_two, 4, 2)
+            # Add better child on their position
+            population.append(mutated_child_one)
+            fitness.append(calculate_fitness([mutated_child_one], distances_matrix))
+            population.append(mutated_child_two)
+            fitness.append(calculate_fitness([mutated_child_one], distances_matrix))
 
-        # Get rid of the worst ones
+        # Get rid of the worst
         for j in range(no_chromosomes_out // 2):
             del population[(fitness.index(max(fitness)))]
             del fitness[fitness.index(max(fitness))]
             del population[fitness.index(max(fitness))]
             del fitness[fitness.index(max(fitness))]
 
-        for i in range(no_chromosomes_out // 2):
-            offspring_one, offspring_two = NewChildProducer.one_point_crossover(
-                picker.tournament(population, fitness, 20),
-                picker.tournament(population, fitness, 20))
-            mutated_child_one = NewChildProducer.mutate_reverse(offspring_one, 4, 2)
-            mutated_child_two = NewChildProducer.mutate_reverse(offspring_two, 4, 2)
-            # Add better child on their position
-            population.append(mutated_child_one)
-            population.append(mutated_child_two)
-
         epoch_num = epoch_num + 1
 
     print("GA has ended after " + str(epoch_num) + " epochs!")
+    # Draw winner
+    winner = population[fitness.index(min(fitness))]
+    draw_path(winner, coordinates)
+    print("Click the image to exit")
+    plt.waitforbuttonpress()
 
 
 if __name__ == "__main__":

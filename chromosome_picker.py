@@ -4,6 +4,24 @@ import random
 import numpy as np
 
 
+def tournament(population, fitness, packet_size):
+    population_idx = np.random.choice(list(range(len(population))), packet_size, replace=False)
+
+    if len(population) != len(fitness):
+        print("ERROR!")
+
+    minimum = fitness[population_idx[0]]
+    minimum_idx = population_idx[0]
+    for idx in population_idx:
+        if idx > len(fitness):
+            print("ERROR!")
+        if minimum < fitness[idx]:
+            minimum = fitness[idx]
+            minimum_idx = idx
+
+    return population[minimum_idx]
+
+
 class ChromosomePicker:
     def __init__(self):
         self.fitness_values = []
@@ -35,19 +53,3 @@ class ChromosomePicker:
 
         return self.population[-1]
 
-    def tournament(self, population, fitness, packet_size):
-        population_idx = np.random.choice(list(range(len(population))), packet_size, replace=False)
-
-        if len(population) != len(fitness):
-            print("ERROR!")
-
-        minimum = fitness[population_idx[0]]
-        minimum_idx = population_idx[0]
-        for idx in population_idx:
-            if idx > len(fitness):
-                print("ERROR!")
-            if minimum < fitness[idx]:
-                minimum = fitness[idx]
-                minimum_idx = idx
-
-        return population[minimum_idx]
