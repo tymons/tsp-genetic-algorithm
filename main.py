@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import chromosome_picker as cp
+import random
 from new_child_producer import NewChildProducer
 
 
@@ -107,8 +108,12 @@ def main():
             offspring_one, offspring_two = NewChildProducer.one_point_crossover(
                 cp.tournament(population, fitness, 20),
                 cp.tournament(population, fitness, 20))
-            mutated_child_one = NewChildProducer.mutate_reverse(offspring_one, 4, 2)
-            mutated_child_two = NewChildProducer.mutate_reverse(offspring_two, 4, 2)
+            mutated_child_one = NewChildProducer.mutate_switch_cities(offspring_one,
+                                                                      random.randrange(1, len(offspring_one)),
+                                                                      random.randrange(1, len(offspring_one)))
+            mutated_child_two = NewChildProducer.mutate_switch_cities(offspring_two,
+                                                                      random.randrange(1, len(offspring_one)),
+                                                                      random.randrange(1, len(offspring_one)))
             # Add better child on their position
             population.append(mutated_child_one)
             fitness.append(calculate_fitness([mutated_child_one], distances_matrix))

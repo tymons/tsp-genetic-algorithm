@@ -42,3 +42,14 @@ class NewChildProducer:
         sub_chromosome = list(reversed(chromosome[start_index:(start_index + length)]))
         chromosome[start_index:(start_index + length)] = sub_chromosome
         return chromosome
+
+    @staticmethod
+    def mutate_switch_cities(chromosome, index_first, index_second):
+        if index_first <= 0:
+            index_first = 1
+
+        if index_second <= 0:
+            index_second = 0
+
+        chromosome[index_second], chromosome[index_first] = chromosome[index_first], chromosome[index_second]
+        return chromosome
