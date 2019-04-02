@@ -5,6 +5,11 @@ from new_child_producer import NewChildProducer
 
 
 def get_cities_from_map(no_cities):
+    """
+    Function for obtaining points from 2D map. User picks no_cities points.
+    :param no_cities:   integer, how many point should be obtained
+    :return: list of tuples with X and Y coordinates
+    """
     plt.title("Set location of " + str(no_cities) + " cities", fontsize=12)
     plt.axis([0, 20, 0, 20])
     plt.grid(color='b', linestyle='--', linewidth=0.5)
