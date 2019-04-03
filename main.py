@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import chromosome_picker as cp
 import random
-from new_child_producer import NewChildProducer
+from new_child_producer import one_point_pmx_crossover, mutate_switch_cities
 
 
 def get_cities_from_map(no_cities):
@@ -60,6 +60,12 @@ def get_distances_matrix(coordinates_tuple_list):
 
 
 def draw_path(winner, coordinates_table):
+    """
+    Function for drawing path with use of matplotlib
+    :param winner:              list of integers which represent single chromosome
+    :param coordinates_table:   list of tuples which holds coordinates for specific city.
+                                Eg. item at index 3 contains tuple (X, Y) for city nr 3.
+    """
     plt.ion()
     plt.clf()
     plt.axis([0, 20, 0, 20])
@@ -105,15 +111,15 @@ def main():
               str(min(fitness)) + " with pop size: " + str(len(population)))
 
         for i in range(no_chromosomes_out // 2):
-            offspring_one, offspring_two = NewChildProducer.one_point_crossover(
+            offspring_one, offspring_two = one_point_pmx_crossover(
                 cp.tournament(population, fitness, 20),
                 cp.tournament(population, fitness, 20))
-            mutated_child_one = NewChildProducer.mutate_switch_cities(offspring_one,
-                                                                      random.randrange(1, len(offspring_one)),
-                                                                      random.randrange(1, len(offspring_one)))
-            mutated_child_two = NewChildProducer.mutate_switch_cities(offspring_two,
-                                                                      random.randrange(1, len(offspring_one)),
-                                                                      random.randrange(1, len(offspring_one)))
+            mutated_child_one = mutate_switch_cities(offspring_one,
+                                                     random.randrange(1, len(offspring_one)),
+                                                     random.randrange(1, len(offspring_one)))
+            mutated_child_two = mutate_switch_cities(offspring_two,
+                                                     random.randrange(1, len(offspring_one)),
+                                                     random.randrange(1, len(offspring_one)))
             # Add better child on their position
             population.append(mutated_child_one)
             fitness.append(calculate_fitness([mutated_child_one], distances_matrix))
