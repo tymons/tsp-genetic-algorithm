@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import chromosome_picker as cp
 import random
+from city import City
 from new_child_producer import one_point_pmx_crossover, mutate_switch_cities
 
 
@@ -9,14 +10,15 @@ def get_cities_from_map(no_cities):
     """
     Function for obtaining points from 2D map. User picks no_cities points.
     :param no_cities:   integer, how many point should be obtained
-    :return: list of tuples with X and Y coordinates
+    :return: list of cities
     """
     plt.title("Set location of " + str(no_cities) + " cities", fontsize=12)
     plt.axis([0, 20, 0, 20])
     plt.grid(color='b', linestyle='--', linewidth=0.5)
-    x = plt.ginput(no_cities)
+    list_of_coordinates = plt.ginput(no_cities)
+    cities_list = list(map(lambda coordinate: City(coordinate[0], coordinate[1]), list_of_coordinates))
     plt.close()
-    return x
+    return cities_list
 
 
 def calculate_fitness(chromosomes_list, distances_matrix):

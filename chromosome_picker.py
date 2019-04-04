@@ -47,4 +47,3 @@ class ChromosomePicker:
             idx += 1
 
         return self.population[-1]
-
