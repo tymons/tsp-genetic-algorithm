@@ -137,7 +137,6 @@ def main():
 
         epoch_num = epoch_num + 1
 
-    print("GA has ended after " + str(epoch_num) + " epochs!")
     # Draw winner
     winner = population[fitness.index(min(fitness))]
     draw_path(winner, coordinates)
