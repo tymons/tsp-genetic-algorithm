@@ -94,16 +94,16 @@ def main():
     epoch_num = 0
 
     # Interactive map for choosing city location
-    coordinates = get_cities_from_map(max_cites)
-    # Calculate matrix of distances
-    distances_matrix = get_distances_matrix(coordinates)
+    cities = get_cities_from_map(max_cites)
 
     # Population initialization
     for idx in range(pop_size):
-        permutation_list = np.random.permutation(range(1, max_cites))
         # City with 0 number should be always at the start
-        permutation_list = np.insert(permutation_list, 0, 0)
-        population.append(permutation_list)
+        cities_rand_permutation = np.append([cities[0]], np.random.permutation(cities[1:]))
+        population.append(cities_rand_permutation)
+
+    # Calculate matrix of distances
+    distances_matrix = get_distances_matrix(coordinates)
 
     fitness = calculate_fitness(population, distances_matrix)
 
