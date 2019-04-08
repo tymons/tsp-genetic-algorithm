@@ -99,8 +99,8 @@ def main():
     # Population initialization
     for idx in range(pop_size):
         # City with 0 number should be always at the start
-        cities_rand_permutation = np.append([cities[0]], np.random.permutation(cities[1:]))
-        population.append(cities_rand_permutation)
+        cities_permutation = np.append([cities[0]], np.random.permutation(cities[1:]))
+        population.append(cities_permutation)
 
     # Calculate matrix of distances
     distances_matrix = get_distances_matrix(coordinates)
