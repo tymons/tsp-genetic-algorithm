@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import chromosome_picker as cp
 import random
 from city import City
+from chromosome import Chromosome
 from new_child_producer import one_point_pmx_crossover, mutate_switch_cities
 
 
@@ -40,25 +41,6 @@ def calculate_fitness(chromosomes_list, distances_matrix):
         population_fitness.append(acc)
 
     return population_fitness
-
-
-def get_distances_matrix(coordinates_tuple_list):
-    """
-    Function that prepares random distance matrix based on the max cities
-    :param coordinates_tuple_list:
-    :return:
-    """
-    shape = (len(coordinates_tuple_list), len(coordinates_tuple_list))
-    a = np.zeros(shape)
-
-    for row_idx, tuple_one in enumerate(coordinates_tuple_list):
-        for col_idx, tuple_two in enumerate(coordinates_tuple_list[row_idx:], start=row_idx):
-            # Euclidean distance
-            distance = np.sqrt(np.power(tuple_two[0] - tuple_one[0], 2) + np.power(tuple_two[1] - tuple_one[1], 2))
-            a[row_idx][col_idx] = distance
-            a[col_idx][row_idx] = distance
-
-    return a
 
 
 def draw_path(winner, coordinates_table):
@@ -100,22 +82,18 @@ def main():
     for idx in range(pop_size):
         # City with 0 number should be always at the start
         cities_permutation = np.append([cities[0]], np.random.permutation(cities[1:]))
-        population.append(cities_permutation)
-
-    # Calculate matrix of distances
-    distances_matrix = get_distances_matrix(coordinates)
-
-    fitness = calculate_fitness(population, distances_matrix)
+        population.append(Chromosome(cities_permutation))
 
     while epoch_num < max_epochs:
         # calculate distances with distances matrix
         print("Minimum fitness score at epoch " + str(epoch_num) + " is : " +
-              str(min(fitness)) + " with pop size: " + str(len(population)))
+              str(min(list(map(lambda chromosome: chromosome.get_fitness(), population))))
+              + " with pop size: " + str(len(population)))
 
         for i in range(no_chromosomes_out // 2):
             offspring_one, offspring_two = one_point_pmx_crossover(
-                cp.tournament(population, fitness, 20),
-                cp.tournament(population, fitness, 20))
+                cp.tournament(population, 20),
+                cp.tournament(population, 20))
             mutated_child_one = mutate_switch_cities(offspring_one,
                                                      random.randrange(1, len(offspring_one)),
                                                      random.randrange(1, len(offspring_one)))
@@ -124,24 +102,29 @@ def main():
                                                      random.randrange(1, len(offspring_one)))
             # Add better child on their position
             population.append(mutated_child_one)
-            fitness.append(calculate_fitness([mutated_child_one], distances_matrix))
             population.append(mutated_child_two)
-            fitness.append(calculate_fitness([mutated_child_one], distances_matrix))
 
         # Get rid of the worst
         for j in range(no_chromosomes_out // 2):
-            del population[(fitness.index(max(fitness)))]
-            del fitness[fitness.index(max(fitness))]
-            del population[fitness.index(max(fitness))]
-            del fitness[fitness.index(max(fitness))]
+            list_of_fitnesses = list(map(lambda chromosome: chromosome.get_fitness(), population))
+
+            max_elem = max(list_of_fitnesses)
+            idx_to_delete = list_of_fitnesses.index(max_elem)
+            del population[idx_to_delete]
+            del list_of_fitnesses[idx_to_delete]
+
+            max_elem = max(list_of_fitnesses)
+            idx_to_delete = list_of_fitnesses.index(max_elem)
+            del population[idx_to_delete]
+            del list_of_fitnesses[idx_to_delete]
 
         epoch_num = epoch_num + 1
 
     # Draw winner
-    winner = population[fitness.index(min(fitness))]
-    draw_path(winner, coordinates)
-    print("Click the image to exit")
-    plt.waitforbuttonpress()
+    # winner = population[fitness.index(min(fitness))]
+    # draw_path(winner, coordinates)
+    # print("Click the image to exit")
+    # plt.waitforbuttonpress()
 
 
 if __name__ == "__main__":

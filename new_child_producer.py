@@ -29,22 +29,22 @@ def one_point_pmx_crossover(parent_one, parent_two):
     :param parent_two:
     :return:
     """
-    crossover_point = random.randint(2, len(parent_one))
-    parent_one_temp = np.array(parent_one)
-    parent_two_temp = np.array(parent_two)
+    crossover_point = random.randint(2, len(parent_one.get_cities_list()))
+    parent_one_temp = np.array(parent_one.get_cities_list())
+    parent_two_temp = np.array(parent_two.get_cities_list())
 
     # We start from index no 1 because city with no 0 should be always at the beginning
-    offspring_one = [parent_one[0]]  # Zero at the beginning
+    offspring_one = [parent_one.get_cities_list()[0]]  # Zero at the beginning
     for idx in range(1, crossover_point - 1):
-        value = parent_two[idx]
+        value = parent_two.get_cities_list()[idx]
         parent_one_temp[np.where(parent_one_temp == value)], parent_one_temp[idx] \
             = parent_one_temp[idx], parent_one_temp[np.where(parent_one_temp == value)]
         offspring_one = np.append(offspring_one, parent_one_temp[idx])
     offspring_one = np.concatenate((offspring_one, parent_one_temp[(crossover_point - 1):]))
 
-    offspring_two = [parent_two[0]]  # Zero at the beginning
+    offspring_two = [parent_two.get_cities_list()[0]]  # Zero at the beginning
     for idx in range(1, crossover_point - 1):
-        value = parent_one[idx]
+        value = parent_one.get_cities_list()[idx]
         parent_two_temp[np.where(parent_two_temp == value)], parent_two_temp[idx] \
             = parent_two_temp[idx], parent_two_temp[np.where(parent_two_temp == value)]
         offspring_two = np.append(offspring_two, parent_two_temp[idx])

@@ -6,7 +6,7 @@ class City:
         self.x = x
         self.y = y
 
-    def distance(self, city):
+    def get_distance_to(self, city):
         x_dist = abs(self.x - city.x)
         y_dis = abs(self.y - city.y)
         distance = np.sqrt((x_dist ** 2) + (y_dis ** 2))
