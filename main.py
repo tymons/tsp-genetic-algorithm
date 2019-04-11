@@ -43,22 +43,21 @@ def calculate_fitness(chromosomes_list, distances_matrix):
     return population_fitness
 
 
-def draw_path(winner, coordinates_table):
+def draw_path(winner_chromosome):
     """
     Function for drawing path with use of matplotlib
-    :param winner:              list of integers which represent single chromosome
-    :param coordinates_table:   list of tuples which holds coordinates for specific city.
-                                Eg. item at index 3 contains tuple (X, Y) for city nr 3.
+    :param winner_chromosome:              Chromosome object for which path should ne drawn
     """
     plt.ion()
     plt.clf()
     plt.axis([0, 20, 0, 20])
     plt.grid(color='b', linestyle='--', linewidth=0.5)
     coordinates = []
-    for city_no in winner:
-        coordinates.append(coordinates_table[city_no])
+    for city in winner_chromosome.get_cities_list():
+        coordinates.append((city.x, city.y))
 
-    coordinates.append(coordinates_table[0])
+    first_city = winner_chromosome.get_cities_list()[0]
+    coordinates.append((first_city.x, first_city.y))
     plt.plot([x[0] for x in coordinates], [x[1] for x in coordinates], '-o')
     plt.plot(coordinates[0][0], coordinates[0][1], alpha=0.8, c="g", marker=r'$\clubsuit$',
              label="Start position", markersize=22)
@@ -69,10 +68,10 @@ def draw_path(winner, coordinates_table):
 
 def main():
     max_cites = 15
-    pop_size = 100
-    no_chromosomes_out = 80
+    pop_size = 150
+    no_chromosomes_out = 50
     population = []
-    max_epochs = 1500
+    max_epochs = 2500
     epoch_num = 0
 
     # Interactive map for choosing city location
@@ -85,6 +84,7 @@ def main():
         population.append(Chromosome(cities_permutation))
 
     while epoch_num < max_epochs:
+
         # calculate distances with distances matrix
         print("Minimum fitness score at epoch " + str(epoch_num) + " is : " +
               str(min(list(map(lambda chromosome: chromosome.get_fitness(), population))))
@@ -101,30 +101,32 @@ def main():
                                                      random.randrange(1, len(offspring_one)),
                                                      random.randrange(1, len(offspring_one)))
             # Add better child on their position
-            population.append(mutated_child_one)
-            population.append(mutated_child_two)
+            population.append(Chromosome(mutated_child_one))
+            population.append(Chromosome(mutated_child_two))
+
+        fitness_list = list(map(lambda chromosome: chromosome.get_fitness(), population))
 
         # Get rid of the worst
         for j in range(no_chromosomes_out // 2):
-            list_of_fitnesses = list(map(lambda chromosome: chromosome.get_fitness(), population))
-
-            max_elem = max(list_of_fitnesses)
-            idx_to_delete = list_of_fitnesses.index(max_elem)
+            max_elem = max(fitness_list)
+            idx_to_delete = fitness_list.index(max_elem)
             del population[idx_to_delete]
-            del list_of_fitnesses[idx_to_delete]
+            del fitness_list[idx_to_delete]
 
-            max_elem = max(list_of_fitnesses)
-            idx_to_delete = list_of_fitnesses.index(max_elem)
+            max_elem = max(fitness_list)
+            idx_to_delete = fitness_list.index(max_elem)
             del population[idx_to_delete]
-            del list_of_fitnesses[idx_to_delete]
+            del fitness_list[idx_to_delete]
 
         epoch_num = epoch_num + 1
 
     # Draw winner
-    # winner = population[fitness.index(min(fitness))]
-    # draw_path(winner, coordinates)
-    # print("Click the image to exit")
-    # plt.waitforbuttonpress()
+    final_fitness_list = list(map(lambda chromosome: chromosome.get_fitness(), population))
+    min_fitness = min(final_fitness_list)
+    winner = population[final_fitness_list.index(min_fitness)]
+    draw_path(winner)
+    print("Click the image to exit")
+    plt.waitforbuttonpress()
 
 
 if __name__ == "__main__":

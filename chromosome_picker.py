@@ -14,10 +14,8 @@ def tournament(chromosome_population, subset_size):
     random_idx_list = np.random.choice(list(range(len(chromosome_population))), subset_size, replace=False)
 
     winner_chromosome = chromosome_population[random_idx_list[0]]
-    print(winner_chromosome)
     for idx in random_idx_list:
-        if winner_chromosome.get_fitness() \
-                < chromosome_population[idx].get_fitness():
+        if winner_chromosome.get_fitness() < chromosome_population[idx].get_fitness():
             winner_chromosome = chromosome_population[idx]
 
     return winner_chromosome
