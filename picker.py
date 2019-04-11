@@ -4,22 +4,21 @@ import random
 import numpy as np
 
 
-def tournament(population, fitness, packet_size):
-    population_idx = np.random.choice(list(range(len(population))), packet_size, replace=False)
+def tournament(chromosome_population, subset_size):
+    """
+    Function for tournament selection
+    :param chromosome_population:   list of chromosomes objects, holding whole population
+    :param subset_size:             size of subset used in tournament
+    :return:                        chromosome with the lowest fitness score
+    """
+    random_idx_list = np.random.choice(list(range(len(chromosome_population))), subset_size, replace=False)
 
-    if len(population) != len(fitness):
-        print("ERROR!")
+    winner_chromosome = chromosome_population[random_idx_list[0]]
+    for idx in random_idx_list:
+        if winner_chromosome.get_fitness() < chromosome_population[idx].get_fitness():
+            winner_chromosome = chromosome_population[idx]
 
-    minimum = fitness[population_idx[0]]
-    minimum_idx = population_idx[0]
-    for idx in population_idx:
-        if idx > len(fitness):
-            print("ERROR!")
-        if minimum < fitness[idx]:
-            minimum = fitness[idx]
-            minimum_idx = idx
-
-    return population[minimum_idx]
+    return winner_chromosome
 
 
 class ChromosomePicker:
@@ -52,4 +51,3 @@ class ChromosomePicker:
             idx += 1
 
         return self.population[-1]
-
