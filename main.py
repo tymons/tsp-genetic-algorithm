@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import chromosome_picker as cp
+import picker as cp
 import random
 from city import City
 from chromosome import Chromosome
-from new_child_producer import one_point_pmx_crossover, mutate_switch_cities
+from evolution import one_point_pmx_crossover, mutate_switch_cities
 
 
 def get_cities_from_map(no_cities):
