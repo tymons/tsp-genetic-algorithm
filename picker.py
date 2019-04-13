@@ -4,6 +4,37 @@ import random
 import numpy as np
 
 
+def rank_selection(chromosome_population):
+    """
+    NOT IMPLEMENTED!
+    :param chromosome_population:
+    :return:
+    """
+    return 0
+
+
+def roulette_wheel(chromosome_population):
+    fitness_list = list(map(lambda chromosome: chromosome.get_fitness(), chromosome_population))
+
+    # Scaling to vector which sum up to one
+    max_val = max(fitness_list)
+    min_val = min(fitness_list)
+    scaled_fitness_list = list(map(lambda x: ((x - min_val)/(max_val - min_val)), fitness_list))
+    scaled_fitness_list = np.divide(scaled_fitness_list, sum(scaled_fitness_list))
+
+    random_val = random.uniform(0, 1)
+
+    idx = 0
+    cumulative_sum = 0
+    while idx < len(scaled_fitness_list):
+        cumulative_sum += scaled_fitness_list[idx]
+        if cumulative_sum > random_val:
+            return chromosome_population[idx]
+        idx += 1
+
+    return chromosome_population[-1]
+
+
 def tournament(chromosome_population, subset_size):
     """
     Function for tournament selection
