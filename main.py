@@ -68,7 +68,7 @@ def draw_path(winner_chromosome):
 
 def main():
     max_cites = 15
-    pop_size = 150
+    pop_size = 100
     no_chromosomes_out = 50
     population = []
     max_epochs = 2500
@@ -92,8 +92,8 @@ def main():
 
         for i in range(no_chromosomes_out // 2):
             offspring_one, offspring_two = one_point_pmx_crossover(
-                cp.tournament(population, 20),
-                cp.tournament(population, 20))
+                cp.roulette_wheel(population),
+                cp.roulette_wheel(population))
             mutated_child_one = mutate_switch_cities(offspring_one,
                                                      random.randrange(1, len(offspring_one)),
                                                      random.randrange(1, len(offspring_one)))
