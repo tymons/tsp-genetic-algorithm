@@ -64,10 +64,11 @@ def draw_path(winner_chromosome):
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.show()
+    plt.pause(0.0001)
 
 
 def main():
-    max_cites = 15
+    max_cites = 30
     pop_size = 100
     no_chromosomes_out = 50
     population = []
@@ -83,12 +84,17 @@ def main():
         cities_permutation = np.append([cities[0]], np.random.permutation(cities[1:]))
         population.append(Chromosome(cities_permutation))
 
+    current_winner = population[0]
     while epoch_num < max_epochs:
 
         # calculate distances with distances matrix
+        fitness_list = list(map(lambda chromosome: chromosome.get_fitness(), population))
+        fitness_min = min(fitness_list)
         print("Minimum fitness score at epoch " + str(epoch_num) + " is : " +
-              str(min(list(map(lambda chromosome: chromosome.get_fitness(), population))))
-              + " with pop size: " + str(len(population)))
+              str(fitness_min) + " with pop size: " + str(len(population)))
+        if current_winner != population[fitness_list.index(fitness_min)]:
+            current_winner = population[fitness_list.index(fitness_min)]
+            draw_path(current_winner)
 
         for i in range(no_chromosomes_out // 2):
             offspring_one, offspring_two = one_point_pmx_crossover(
