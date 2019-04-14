@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class Chromosome:
     def __init__(self, cities):
         self.__cities = cities
@@ -21,3 +18,6 @@ class Chromosome:
 
     def get_cities_list(self):
         return self.__cities
+
+    def __lt__(self, other):
+        return self.__fitness < other.get_fitness()

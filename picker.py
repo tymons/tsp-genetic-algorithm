@@ -8,7 +8,23 @@ def rank_selection(chromosome_population):
     :param chromosome_population:
     :return:
     """
-    return 0
+    chromosome_population_temp = list(chromosome_population)
+    chromosome_population_temp.sort(reverse=True)
+
+    range_fitness = range(1, len(chromosome_population_temp))
+    range_fitness_scaled = np.divide(range_fitness, sum(range_fitness))
+
+    random_val = random.uniform(0, 1)
+
+    idx = 0
+    cumulative_sum = 0
+    while idx < len(range_fitness_scaled):
+        cumulative_sum += range_fitness_scaled[idx]
+        if cumulative_sum > random_val:
+            return chromosome_population_temp[idx]
+        idx += 1
+
+    return chromosome_population_temp[-1]
 
 
 def roulette_wheel(chromosome_population):
