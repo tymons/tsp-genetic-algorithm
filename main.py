@@ -97,9 +97,10 @@ def main():
             draw_path(current_winner)
 
         for i in range(no_chromosomes_out // 2):
+            offspring_list = cp.rank_selection(population)
             offspring_one, offspring_two = one_point_pmx_crossover(
-                cp.rank_selection(population),
-                cp.rank_selection(population))
+                offspring_list[0],
+                offspring_list[1])
             mutated_child_one = mutate_switch_cities(offspring_one,
                                                      random.randrange(1, len(offspring_one)),
                                                      random.randrange(1, len(offspring_one)))

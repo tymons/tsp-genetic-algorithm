@@ -4,7 +4,7 @@ import numpy as np
 
 def rank_selection(chromosome_population):
     """
-    NOT IMPLEMENTED!
+    Function for picking up choromosome based on ranked selection algorithm
     :param chromosome_population:
     :return:
     """
@@ -16,15 +16,18 @@ def rank_selection(chromosome_population):
 
     random_val = random.uniform(0, 1)
 
-    idx = 0
-    cumulative_sum = 0
-    while idx < len(range_fitness_scaled):
-        cumulative_sum += range_fitness_scaled[idx]
-        if cumulative_sum > random_val:
-            return chromosome_population_temp[idx]
-        idx += 1
+    offsprings_list = []
+    for _ in range(1, 2):
+        idx = 0
+        cumulative_sum = 0
+        while idx < len(range_fitness_scaled):
+            cumulative_sum += range_fitness_scaled[idx]
+            if cumulative_sum > random_val:
+                offsprings_list.append(chromosome_population[idx])
+            idx += 1
+        offsprings_list.append(chromosome_population[idx])
 
-    return chromosome_population_temp[-1]
+    return offsprings_list
 
 
 def roulette_wheel(chromosome_population):
@@ -39,7 +42,7 @@ def roulette_wheel(chromosome_population):
     # Scaling to vector which sum up to one
     max_val = max(fitness_list)
     min_val = min(fitness_list)
-    scaled_fitness_list = list(map(lambda x: ((x - min_val)/(max_val - min_val)), fitness_list))
+    scaled_fitness_list = list(map(lambda x: ((x - min_val) / (max_val - min_val)), fitness_list))
     scaled_fitness_list = np.divide(scaled_fitness_list, sum(scaled_fitness_list))
 
     random_val = random.uniform(0, 1)
