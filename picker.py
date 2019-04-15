@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 
-def rank_selection(chromosome_population):
+def rank_selection_two_offsprings(chromosome_population):
     """
     Function for picking up choromosome based on ranked selection algorithm
     :param chromosome_population:
@@ -14,28 +14,28 @@ def rank_selection(chromosome_population):
     range_fitness = range(1, len(chromosome_population_temp))
     range_fitness_scaled = np.divide(range_fitness, sum(range_fitness))
 
-    random_val = random.uniform(0, 1)
-
     offsprings_list = []
     for _ in range(1, 2):
         idx = 0
         cumulative_sum = 0
+
+        random_val = random.uniform(0, 1)
         while idx < len(range_fitness_scaled):
             cumulative_sum += range_fitness_scaled[idx]
             if cumulative_sum > random_val:
                 offsprings_list.append(chromosome_population[idx])
             idx += 1
-        offsprings_list.append(chromosome_population[idx])
+        offsprings_list.append(chromosome_population[-1])
 
     return offsprings_list
 
 
-def roulette_wheel(chromosome_population):
+def roulette_wheel_two_offsprings(chromosome_population):
     """
     Function that implements roulette wheel selection. One chromosome is picked from whole population based on his fitness score.
     Chromosome which has better fitness score will be selected with higher probability.
     :param chromosome_population:   population will all chromosomes
-    :return:                        roulette wheel selected chromosome
+    :return:                        roulette wheel selected chromosomes
     """
     fitness_list = list(map(lambda chromosome: chromosome.get_fitness(), chromosome_population))
 
@@ -45,17 +45,20 @@ def roulette_wheel(chromosome_population):
     scaled_fitness_list = list(map(lambda x: ((x - min_val) / (max_val - min_val)), fitness_list))
     scaled_fitness_list = np.divide(scaled_fitness_list, sum(scaled_fitness_list))
 
-    random_val = random.uniform(0, 1)
+    offsprings_list = []
+    for _ in range(1, 2):
+        idx = 0
+        cumulative_sum = 0
 
-    idx = 0
-    cumulative_sum = 0
-    while idx < len(scaled_fitness_list):
-        cumulative_sum += scaled_fitness_list[idx]
-        if cumulative_sum > random_val:
-            return chromosome_population[idx]
-        idx += 1
+        random_val = random.uniform(0, 1)
+        while idx < len(scaled_fitness_list):
+            cumulative_sum += scaled_fitness_list[idx]
+            if cumulative_sum > random_val:
+                offsprings_list.append(chromosome_population[idx])
+            idx += 1
+        offsprings_list.append(chromosome_population[-1])
 
-    return chromosome_population[-1]
+    return offsprings_list
 
 
 def tournament(chromosome_population, subset_size):
