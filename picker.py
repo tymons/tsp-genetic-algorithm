@@ -4,9 +4,14 @@ import numpy as np
 
 def rank_selection_two_offsprings(chromosome_population):
     """
-    Function for picking up choromosome based on ranked selection algorithm
-    :param chromosome_population:
-    :return:
+    Function for picking up chromosomes based on ranked selection algorithm.
+    Ranked Selection Algorithm firstly sorts all chromosomes based on their fitness function.
+    Then every chromosome is assigned with value reflecting position in the sorted list. Indexes are normalized
+    for probability-like values (min-max scaling) and then divided by sum of indexes to add up to one.
+    Having such one can perform ordinary roulette selection algorithm which will be not so biased as basic Roulette
+    algorithm.
+    :param chromosome_population:   set or list of chromosomes
+    :return:                        list of two chromosomes picked up based on renk selection algorithm
     """
     chromosome_population_temp = list(chromosome_population)
     chromosome_population_temp.sort(reverse=True)
