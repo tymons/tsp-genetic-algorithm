@@ -25,9 +25,9 @@ def mutate_switch_cities(chromosome, index_first, index_second):
 def one_point_pmx_crossover(parent_one, parent_two):
     """
     Function witch use PMX crossover for TSP
-    :param parent_one:
-    :param parent_two:
-    :return:
+    :param parent_one:  chromosome object
+    :param parent_two:  chromosome object
+    :return:    two offsprings
     """
     crossover_point = random.randint(2, len(parent_one.get_cities_list()))
     parent_one_temp = np.array(parent_one.get_cities_list())

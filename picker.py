@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 
-def rank_selection_two_offsprings(chromosome_population):
+def rank_selection_with_two_offsprings(chromosome_population):
     """
     Function for picking up chromosomes based on ranked selection algorithm.
     Ranked Selection Algorithm firstly sorts all chromosomes based on their fitness function.
@@ -35,7 +35,7 @@ def rank_selection_two_offsprings(chromosome_population):
     return offsprings_list
 
 
-def roulette_wheel_two_offsprings(chromosome_population):
+def roulette_wheel_with_two_offsprings(chromosome_population):
     """
     Function that implements roulette wheel selection. One chromosome is picked from whole population based on his fitness score.
     Chromosome which has better fitness score will be selected with higher probability.

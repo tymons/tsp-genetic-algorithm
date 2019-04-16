@@ -97,7 +97,7 @@ def main():
             draw_path(current_winner)
 
         for i in range(no_chromosomes_out // 2):
-            offspring_list = cp.roulette_wheel_two_offsprings(population)
+            offspring_list = cp.roulette_wheel_with_two_offsprings(population)
             offspring_one, offspring_two = one_point_pmx_crossover(
                 offspring_list[0],
                 offspring_list[1])
