@@ -35,6 +35,8 @@ def rank_selection_with_two_offsprings(chromosome_population):
     return offsprings_list
 
 
+# Ta funkcja jest bardzo dziwna, zwraca listę chromosomów, a powinna zwrócić (chyba) jeden.
+# Dlaczego 'with_two_offsprings' ?? to selecja rodziców, jak rozumiem, nie potomków
 def roulette_wheel_with_two_offsprings(chromosome_population):
     """
     Function that implements roulette wheel selection. One chromosome is picked from whole population based on his fitness score.
@@ -51,7 +53,7 @@ def roulette_wheel_with_two_offsprings(chromosome_population):
     scaled_fitness_list = np.divide(scaled_fitness_list, sum(scaled_fitness_list))
 
     offsprings_list = []
-    for _ in range(1, 2):
+    for _ in range(1, 2):               # ?????
         idx = 0
         cumulative_sum = 0
 
@@ -59,11 +61,15 @@ def roulette_wheel_with_two_offsprings(chromosome_population):
         while idx < len(scaled_fitness_list):
             cumulative_sum += scaled_fitness_list[idx]
             if cumulative_sum > random_val:
-                offsprings_list.append(chromosome_population[idx])
-            idx += 1
-        offsprings_list.append(chromosome_population[-1])
-
-    return offsprings_list
+                return chromosome_population[idx]
+        return chromosome_population[-1]
+    #             offsprings_list.append(chromosome_population[idx])
+    #             break
+    #             # TU POWINIEN BYĆ BREAK
+    #         idx += 1
+    #     offsprings_list.append(chromosome_population[-1])
+    #
+    # return offsprings_list
 
 
 def tournament(chromosome_population, subset_size):

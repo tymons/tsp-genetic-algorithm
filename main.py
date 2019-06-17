@@ -4,7 +4,7 @@ import picker as cp
 import random
 from city import City
 from chromosome import Chromosome
-from evolution import one_point_pmx_crossover, mutate_switch_cities
+from evolution import one_point_pmx_crossover, mutate_switch_cities, mutate_reverse
 
 
 def get_cities_from_map(no_cities):
@@ -17,11 +17,13 @@ def get_cities_from_map(no_cities):
     plt.axis([0, 20, 0, 20])
     plt.grid(color='b', linestyle='--', linewidth=0.5)
     list_of_coordinates = plt.ginput(no_cities)
-    cities_list = list(map(lambda coordinate: City(coordinate[0], coordinate[1]), list_of_coordinates))
+    # cities_list = list(map(lambda coordinate: City(coordinate[0], coordinate[1]), list_of_coordinates))
+    cities_list = [City(c[0], c[1]) for c in list_of_coordinates]
     plt.close()
     return cities_list
 
 
+# po co ta funkcja, skoro każdy chromosom ma swoją metodę calculate_fitness??
 def calculate_fitness(chromosomes_list, distances_matrix):
     """
     Function that calculates fitness for every chromosome based on distance matrix
@@ -30,14 +32,20 @@ def calculate_fitness(chromosomes_list, distances_matrix):
     :return:                    List of tuples where first element is chromosome and second fitness score
     """
     population_fitness = []
-    for i in range(len(chromosomes_list)):
+    # for i in range(len(chromosomes_list)):
+    #     acc = 0
+    #     for j in range(len(chromosomes_list[i])):
+    #         if j + 1 < len(chromosomes_list[i]):
+    #             value = distances_matrix[chromosomes_list[i][j]][chromosomes_list[i][j + 1]]
+    #         else:
+    #             value = distances_matrix[chromosomes_list[i][j]][chromosomes_list[i][0]]
+    #         acc += value
+    #     population_fitness.append(acc)
+
+    for chromosome in chromosomes_list:
         acc = 0
-        for j in range(len(chromosomes_list[i])):
-            if j + 1 < len(chromosomes_list[i]):
-                value = distances_matrix[chromosomes_list[i][j]][chromosomes_list[i][j + 1]]
-            else:
-                value = distances_matrix[chromosomes_list[i][j]][chromosomes_list[i][0]]
-            acc += value
+        for connected_pair in zip(chromosome, chromosome[-1]+chromosome[:-1]):
+            acc += distances_matrix[connected_pair[0]][connected_pair[1]]
         population_fitness.append(acc)
 
     return population_fitness
@@ -52,12 +60,16 @@ def draw_path(winner_chromosome):
     plt.clf()
     plt.axis([0, 20, 0, 20])
     plt.grid(color='b', linestyle='--', linewidth=0.5)
-    coordinates = []
-    for city in winner_chromosome.get_cities_list():
-        coordinates.append((city.x, city.y))
+    # coordinates = []
+    # for city in winner_chromosome.get_cities_list():
+    #     coordinates.append((city.x, city.y))
 
-    first_city = winner_chromosome.get_cities_list()[0]
-    coordinates.append((first_city.x, first_city.y))
+    # first_city = winner_chromosome.get_cities_list()[0]
+    # coordinates.append((first_city.x, first_city.y))
+
+    coordinates = [(city.x, city.y) for city in winner_chromosome.get_cities_list()]
+    coordinates += coordinates[0:1]
+
     plt.plot([x[0] for x in coordinates], [x[1] for x in coordinates], '-o')
     plt.plot(coordinates[0][0], coordinates[0][1], alpha=0.8, c="g", marker=r'$\clubsuit$',
              label="Start position", markersize=22)
@@ -70,7 +82,7 @@ def draw_path(winner_chromosome):
 def main():
     max_cites = 25
     pop_size = 100
-    no_chromosomes_out = 50
+    no_chromosomes_out = 50          # should be even
     population = []
     max_epochs = 2500
     epoch_num = 0
@@ -88,42 +100,67 @@ def main():
     while epoch_num < max_epochs:
 
         # calculate distances with distances matrix
-        fitness_list = list(map(lambda chromosome: chromosome.get_fitness(), population))
-        fitness_min = min(fitness_list)
+        # fitness_list = list(map(lambda chromosome: chromosome.get_fitness(), population))
+        fitness_list = [chromosome.get_fitness() for chromosome in population]
+
+        # fitness_min = min(fitness_list)
+        # if current_winner != population[fitness_list.index(fitness_min)]:
+        #     current_winner = population[fitness_list.index(fitness_min)]
+        #     draw_path(current_winner)
+
+        fitness_min_idx = int(np.argmin(fitness_list))
+        fitness_min = fitness_list[fitness_min_idx]
         print("Minimum fitness score at epoch " + str(epoch_num) + " is : " +
               str(fitness_min) + " with pop size: " + str(len(population)))
-        if current_winner != population[fitness_list.index(fitness_min)]:
-            current_winner = population[fitness_list.index(fitness_min)]
+        if current_winner != population[fitness_min_idx]:       # chodziło tu o to czy to dokładnie ten sam obiekt, tak? (porównywanie adresów)
+            current_winner = population[fitness_min_idx]
             draw_path(current_winner)
 
         for i in range(no_chromosomes_out // 2):
-            offspring_list = cp.roulette_wheel_with_two_offsprings(population)
-            offspring_one, offspring_two = one_point_pmx_crossover(
-                offspring_list[0],
-                offspring_list[1])
-            mutated_child_one = mutate_switch_cities(offspring_one,
-                                                     random.randrange(1, len(offspring_one)),
-                                                     random.randrange(1, len(offspring_one)))
-            mutated_child_two = mutate_switch_cities(offspring_two,
-                                                     random.randrange(1, len(offspring_one)),
-                                                     random.randrange(1, len(offspring_one)))
-            # Add better child on their position
-            population.append(Chromosome(mutated_child_one))
-            population.append(Chromosome(mutated_child_two))
+            # offspring_list = cp.roulette_wheel_with_two_offsprings(population)
+            # offspring_one, offspring_two = one_point_pmx_crossover(
+            #     offspring_list[0],
+            #     offspring_list[1])
+            parents = [cp.roulette_wheel_with_two_offsprings(population) for _ in range(2)]
+            offspring_one, offspring_two = one_point_pmx_crossover(parents[0], parents[1])
 
-        fitness_list = list(map(lambda chromosome: chromosome.get_fitness(), population))
+            # mutated_child_one = mutate_switch_cities(offspring_one,
+            #                                          random.randrange(1, len(offspring_one)),
+            #                                          random.randrange(1, len(offspring_one)))
+            # mutated_child_two = mutate_switch_cities(offspring_two,
+            #                                          random.randrange(1, len(offspring_one)),
+            #                                          random.randrange(1, len(offspring_one)))
 
-        # Get rid of the worst
-        for j in range(no_chromosomes_out // 2):
-            max_elem = max(fitness_list)
-            idx_to_delete = fitness_list.index(max_elem)
-            del population[idx_to_delete]
-            del fitness_list[idx_to_delete]
+            # # Add better child on their position
+            # population.append(Chromosome(mutated_child_one))
+            # population.append(Chromosome(mutated_child_two))
 
-            max_elem = max(fitness_list)
-            idx_to_delete = fitness_list.index(max_elem)
-            del population[idx_to_delete]
-            del fitness_list[idx_to_delete]
+            for offspring in [offspring_one, offspring_two]:
+                mutated_child = mutate_reverse(offspring)           # ja bym nie mutował za każdym razem, ale tylko z jakimś p-wem
+                population.append(Chromosome(mutated_child))
+
+        # fitness_list = list(map(lambda chromosome: chromosome.get_fitness(), population))
+
+        # # Get rid of the worst
+        # for j in range(no_chromosomes_out // 2):
+        #     max_elem = max(fitness_list)
+        #     idx_to_delete = fitness_list.index(max_elem)
+        #     del population[idx_to_delete]
+        #     del fitness_list[idx_to_delete]
+        #
+        #     max_elem = max(fitness_list)
+        #     idx_to_delete = fitness_list.index(max_elem)
+        #     del population[idx_to_delete]
+        #     del fitness_list[idx_to_delete]
+
+        # tutaj, z obliczeniowego punktu widzenia, lepiej byloby zrobić sort i za jednym zamachem pozbyć się najgorszych
+        # ale, w ogóle nie wiem czy to jest dobre podejście: w algorytmach genetycznych czasem chcemy słabych osobników
+        # zachować - jeśli mają szczęście (dla róźnorodności)
+
+        fitness_list = [c.get_fitness() for c in population]
+        # # Get rid of the worst
+        selected = np.argsort(fitness_list)[:-no_chromosomes_out]
+        population = [c for (n, c) in enumerate(population) if n in selected]
 
         epoch_num = epoch_num + 1
 

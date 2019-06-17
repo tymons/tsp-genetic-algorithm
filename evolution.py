@@ -2,12 +2,15 @@ import numpy as np
 import random
 
 
-def mutate_reverse(chromosome, start_index, length):
-    if start_index <= 0:
-        start_index = 1
+def mutate_reverse(chromosome):
+    # if start_index <= 0:
+    #     start_index = 1
 
-    sub_chromosome = list(reversed(chromosome[start_index:(start_index + length)]))
-    chromosome[start_index:(start_index + length)] = sub_chromosome
+    # sub_chromosome = list(reversed(chromosome[start_index:(start_index + length)]))
+    # chromosome[start_index:(start_index + length)] = sub_chromosome
+
+    [pos1, pos2] = sorted([random.randrange(1, len(chromosome)) for _ in range(2)])
+    chromosome[pos1:pos2] = chromosome[pos1:pos2][::-1]
     return chromosome
 
 
@@ -22,6 +25,7 @@ def mutate_switch_cities(chromosome, index_first, index_second):
     return chromosome
 
 
+# !!! uwaga, ta metoda nie zwraca 'chromosome object', a np.ndarray !!!
 def one_point_pmx_crossover(parent_one, parent_two):
     """
     Function witch use PMX crossover for TSP
